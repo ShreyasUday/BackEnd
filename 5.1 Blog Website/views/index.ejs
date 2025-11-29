@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GyanBlog</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link rel="icon" type="image/png" href="/images/notepad.png">
+  </head>
+  <body>
+    <div class="container1">
+      <%- include("partials/header.ejs") %>
+      <div class="mainBody">
+        <div class="hero">
+          <div><img src="/images/notepad.png" /></div>
+          <div class="heroPara">
+            <p>Get your thoughts together<br />here at GyanBlog</p>
+            <div class="buttons">
+              <form action="/create" method="get">
+                <button class="btn" type="submit">Create</button>
+              </form>
+              <form action="/saves" method="get">
+                <button class="btn" type="submit">Previous Posts</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+       <%- include("partials/footer.ejs") %>
+    </div>
+  </body>
+</html>

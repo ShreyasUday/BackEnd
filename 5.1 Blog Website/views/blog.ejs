@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GyanBlog</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body>
+    <div class="container1">
+      <%- include("partials/header.ejs") %>
+      <div class="mainBody">
+        <div class="hero">
+          <form action="/submit" method="post" class="writing">
+            <div class="title">
+              <input
+                type="text"
+                name="title"
+                placeholder="Blog Title"
+                required
+              />
+            </div>
+            <br /><br />
+            <div class="area">
+              <textarea
+                name="content"
+                rows="8"
+                cols="40"
+                placeholder="Write your blog here..."
+                required
+              ></textarea>
+            </div>
+            <br /><br />
+            <div class="sub">
+              <button type="submit">Publish</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <%- include("partials/footer.ejs") %>
+    </div>
+  </body>
+</html>
