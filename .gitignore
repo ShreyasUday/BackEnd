@@ -13,6 +13,8 @@ pnpm-debug.log
 # Editor folders
 .vscode/
 .idea/
+ReccoFlix/
+
 
 # Build output
 dist/
@@ -21,3 +23,5 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+
+**/.git
