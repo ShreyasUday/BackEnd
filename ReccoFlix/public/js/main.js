@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+
     const toggleButton = document.getElementById('menuToggle');
     const navList = document.querySelector('.nav-menu ul');
 
@@ -8,33 +9,49 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Listen for clicks on anime cards
+    // Existing functionality for anime-card
     const animeCards = document.querySelectorAll('.anime-card');
-
     animeCards.forEach(card => {
         card.addEventListener('click', () => {
             const animeElement = card.querySelector('.anime-title');
-            const animeName = animeElement ? animeElement.innerText.trim() : null;
+            const animeName = animeElement ? animeElement.dataset.anime : null;
 
             if (animeName) {
-                // Send the selected anime name to the server
                 fetch('/description', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message: animeName }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: animeName })
                 })
-                    .then(response => {
-                        if (response.redirected) {
-                            // if backend renders a new page, follow redirect
-                            window.location.href = response.url;
-                        } else {
-                            return response.text();
-                        }
+                    .then(res => res.json())
+                    .then(data => {
+                        window.location.href = data.redirectUrl;
                     })
                     .catch(error => console.error("Fetch error:", error));
             }
         });
     });
+
+
+    // NEW — handles franchise + related cards
+    document.querySelectorAll('.franchise-card, .related-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const animeName = card.getAttribute('data-anime');
+            if (!animeName) return;
+
+            fetch('/description', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: animeName })
+            })
+                .then(res => {
+                    if (res.redirected) {
+                        window.location.href = res.url;
+                    } else {
+                        window.location.href = `/description?anime=${encodeURIComponent(animeName)}`;
+                    }
+                })
+                .catch(err => console.error("Card fetch error:", err));
+        });
+    });
+
 });

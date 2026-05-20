@@ -525,7 +525,7 @@
             position: absolute;
             top: 100%;
             right: 1rem;
-            
+
             width: 180px;
             flex-direction: column;
             background-color: #1c212a;
@@ -582,4 +582,153 @@
             flex-direction: column;
             justify-content: space-around;
         }
+    }
+
+
+    /* ===============================
+   ANIME DESCRIPTION PAGE
+================================*/
+
+    .anime-description-container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 2rem auto 4rem auto;
+        padding: 1rem;
+        display: flex;
+        gap: 3rem;
+        color: white;
+    }
+
+    .anime-description-poster img {
+        width: 320px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .anime-description-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .anime-description-title {
+        font-size: 3rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: white;
+    }
+
+    .anime-description-meta {
+        font-size: 1.1rem;
+        line-height: 1.8rem;
+        opacity: 0.9;
+    }
+
+    .anime-description-synopsis {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        opacity: 0.85;
+        max-width: 90%;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+
+        .anime-description-container {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2rem;
+        }
+
+        .anime-description-poster img {
+            width: 70%;
+            max-width: 260px;
+        }
+
+        .anime-description-synopsis {
+            max-width: 100%;
+        }
+    }
+
+    /* =============================
+   WATCH BUTTONS
+==============================*/
+
+    .watch-buttons {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .watch-btn {
+        padding: 0.7rem 1.2rem;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .watch-btn:hover {
+        transform: scale(1.05);
+    }
+
+    /* Colors */
+    .crunchyroll {
+        background-color: #f47521;
+    }
+
+    .netflix {
+        background-color: #e50914;
+    }
+
+    .prime {
+        background-color: #00a8e1;
+    }
+
+    /* =============================
+   RELATED ANIME
+==============================*/
+
+    .related-title {
+        font-size: 2rem;
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+        color: white;
+        text-align: left;
+        width: 90%;
+    }
+
+    .related-container {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        max-width: 1200px;
+        padding-bottom: 4rem;
+    }
+
+    .related-card {
+        width: 150px;
+        cursor: pointer;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.6rem;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .related-card:hover {
+        transform: translateY(-6px);
+    }
+
+    .related-card img {
+        width: 100%;
+        border-radius: 6px;
+    }
+
+    .related-card p {
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
     }

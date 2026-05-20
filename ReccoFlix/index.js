@@ -1,110 +1,165 @@
-import express from "express"
-import bodyParser from "body-parser"
-import axios from "axios"
+import express from "express";
+import bodyParser from "body-parser";
+import axios from "axios";
 
-const app = express()
+const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(express.json())
-app.use(express.static("public"))
-app.set("view engine", "ejs")
-app.set("views", "./views")
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static("public"));
+app.set("view engine", "ejs");
+app.set("views", "./views");
 
-app.get("/", async (req, res) => {
-  res.render("home")
-})
+// ================================
+// HELPER
+// ================================
+function extractFranchiseKeyword(animeData) {
+  return animeData.attributes.canonicalTitle.split(/[(:]/)[0].trim();
+}
 
+
+// ================================
+// HOME
+// ================================
+app.get("/", (req, res) => {
+  res.render("home");
+});
+
+app.get("/category", (req, res) => {
+  res.render("category");
+});
+
+
+
+// ================================
+// SEARCH
+// ================================
 app.get("/search", (req, res) => {
-  res.render("search", {
-    items: "shreyas"
-  })
-})
+  res.render("search", { items: [], searched: false });
+});
 
 app.post("/search", async (req, res) => {
-  const request = req.body.search_data
-  console.log(request)
-  try {
-    const response = await axios.get(`https://kitsu.io/api/edge/anime?filter[text]=${request}`)
-    const items = response.data.data
+  const request = req.body.search_data;
 
-    if (items.length !== 0) {
-      res.render("browse", {
-        items: items,
-        content: items.length ? items[0].attributes.posterImage.small : ""
-      })
-    } else {
-      res.render("search", {
-        items: items
-      })
-    }
-  } catch (error) {
-    console.error(error)
+  try {
+    const response = await axios.get(
+      `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(request)}`
+    );
+
+    const items = response.data.data;
+
+    // 🔧 FIX: search results go to browse (ORIGINAL DESIGN)
+    res.render("browse", { items });
+
+  } catch (err) {
+    console.log("Search error:", err.message);
+    res.render("search", { items: [], searched: true });
   }
-})
+});
+
+// ================================
+// BROWSE (CATEGORY)
+// ================================
+
+app.get("/browse", (req, res) => {
+  res.render("browse", { items: [] });
+});
 
 app.post("/browse", async (req, res) => {
-  let selectedCategory = ""
+  let selectedCategory = "";
+
   const genreKeys = [
-    "action", "adventure", "scifi", "fantasy", "drama", "comedy",
-    "mystery", "thriller", "sports", "romance", "slice of life", "historical"
+    "action", "adventure", "scifi", "fantasy", "drama",
+    "comedy", "mystery", "thriller", "sports",
+    "romance", "slice of life", "historical"
   ];
+
   for (const key of genreKeys) {
-    if (req.body.hasOwnProperty(key)) {
-      selectedCategory = key;
-      break;
-    }
+    if (req.body.hasOwnProperty(key)) selectedCategory = key;
   }
-  const finalCategory = selectedCategory || "action";
-  console.log(`Filtering by category: ${finalCategory}`);
+
   try {
-    const response = await axios.get(`https://kitsu.io/api/edge/anime?filter[categories]=${selectedCategory}&include=categories&page[limit]=20`)
-    const items = response.data.data
+    const response = await axios.get(
+      `https://kitsu.io/api/edge/anime?filter[categories]=${selectedCategory}&page[limit]=20`
+    );
 
-    res.render("browse", {
-      items: items,
-      content: items.length ? items[0].attributes.posterImage.small : ""
-    })
+    const items = response.data.data;
 
-  } catch (error) {
-    // console.error(error)
+    res.render("browse", { items });
+
+  } catch (err) {
+    console.log("Browse error:", err.message);
+    res.render("browse", { items: [] });
   }
-})
+});
 
-app.post("/description", async (req, res) => {
+// ================================
+// CARD CLICK → DESCRIPTION
+// ================================
+app.post("/description", (req, res) => {
+  const animeName = req.body.anime_name || req.body.message;
+  // if (!animeName) return res.redirect("/search");
+  console.log(animeName)
+  res.json({
+    redirectUrl: `/description?anime=${encodeURIComponent(animeName)}`
+  });
+
+});
+
+// ================================
+// DESCRIPTION PAGE
+// ================================
+app.get("/description", async (req, res) => {
+  const animeName = req.query.anime;
+
   try {
-    const animeName = req.body.anime_name || req.body.message
+    const response = await axios.get(
+      `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(animeName)}&page[limit]=5`
+    );
 
-    if (!animeName) {
-      console.error("Error: Anime name not provided in POST body.");
-      return res.status(400).send("Anime name required.");
-    }
+    const animeData = response.data.data[0];
+    if (!animeData) {
+    return res.status(404).send("Anime not found");
+}
 
-    console.log(animeName)
-    const response = await axios.get(`https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(animeName)}&page[limit]=1`)
+    const canonical = animeData.attributes.canonicalTitle.toLowerCase();
+    console.log(canonical)
+    const franchiseKeyword = extractFranchiseKeyword(animeData);
+
+    const franchiseResponse = await axios.get(
+      `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(franchiseKeyword)}&page[limit]=30`
+    );
+
+    const franchise = franchiseResponse.data.data.filter(item => {
+      const title = item.attributes.canonicalTitle.toLowerCase();
+      return (
+        title !== canonical &&
+        title.includes(franchiseKeyword.toLowerCase())
+      );
+    });
+
+    const relatedResponse = await axios.get(
+      `https://kitsu.io/api/edge/anime?filter[subtype]=${animeData.attributes.subtype}&page[limit]=20`
+    );
+
+    const related = relatedResponse.data.data.filter(item =>
+      item.attributes.canonicalTitle.toLowerCase() !== canonical
+    );
+
     res.render("description", {
-      desc: response.data.data,
-      anime: animeName
-    })
-  } catch (error) {
-    console.error("Error fetching anime details:", error.message || error);
-    res.status(500).render("error_page", { error: "Failed to load anime details." });
+      desc: animeData,
+      anime: animeName,
+      franchise,
+      related
+    });
+
+  } catch (err) {
+    console.log("Description error:", err.message);
+    res.redirect("/search"); // 🔧 FIX: no missing error_page
   }
+});
 
-
-})
-
-app.get("/")
-
-app.get("/category", async (req, res) => {
-  res.render("category")
-})
-
-app.get("/browse", async (req, res) => {
-  res.render("browse")
-})
-
-
-
+// ================================
 app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000")
-})
+  console.log("Server running on http://localhost:3000");
+});

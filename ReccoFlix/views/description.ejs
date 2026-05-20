@@ -1,33 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReccoFlix</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= desc.attributes.canonicalTitle %> | ReccoFlix</title>
     <link rel="stylesheet" href="/styles/main.css" />
 </head>
+
 <body>
-    <div class="container">
-        <%- include("partials/header.ejs") %>
-            <div class="description-content">
-                <div class="desc-img">
-                    <% for (let i = 0; i < desc.length; i++) { %>
-                        <% if(desc[i].attributes.canonicalTitle === anime){ %>
-                            <img src="<%= desc[i].attributes.posterImage.tiny %>" alt="<%= desc[i].attributes.titles.en || 'Anime Poster' %>">
-                        <% } %>
-                        
-                    <% } %>
-                </div>
-                <div class="desc-about">
+<div class="container">
 
-                </div>
-                <div class="desc-about">
+    <%- include("partials/header.ejs") %>
 
-                </div>
+    <!-- MAIN DESCRIPTION SECTION -->
+    <div class="anime-description-container">
+
+        <div class="anime-description-poster">
+            <img src="<%= desc.attributes.posterImage.large %>"
+                 alt="<%= desc.attributes.canonicalTitle %>" />
+        </div>
+
+        <div class="anime-description-content">
+
+            <h1 class="anime-description-title">
+                <%= desc.attributes.canonicalTitle %>
+            </h1>
+
+            <div class="anime-description-meta">
+                ⭐ Rating: <%= desc.attributes.averageRating || "N/A" %> <br />
+                🎞 Episodes: <%= desc.attributes.episodeCount || "Unknown" %> <br />
+                📅 Release: <%= desc.attributes.startDate || "Unknown" %> <br />
+                🎬 Status: <%= desc.attributes.status %> <br />
+                🧪 Type: <%= desc.attributes.subtype %>
             </div>
-        <%- include("partials/footer.ejs") %>
+
+            <p class="anime-description-synopsis">
+                <%= desc.attributes.synopsis %>
+            </p>
+
+            <div class="watch-buttons">
+                <a href="https://www.crunchyroll.com/search?q=<%= anime %>"
+                   target="_blank" class="watch-btn crunchyroll">Watch on Crunchyroll</a>
+
+                <a href="https://www.netflix.com/search?q=<%= anime %>"
+                   target="_blank" class="watch-btn netflix">Watch on Netflix</a>
+
+                <a href="https://www.primevideo.com/search?q=<%= anime %>"
+                   target="_blank" class="watch-btn prime">Watch on Prime Video</a>
+            </div>
+
+        </div>
     </div>
-    <script src="js/main.js"></script>
+
+
+
+    <!-- FRANCHISE SECTION -->
+    <h2 class="related-title">
+        More from the <%= desc.attributes.canonicalTitle.split(/[(:]/)[0] %> Universe
+    </h2>
+
+    <% if (franchise.length === 0) { %>
+        <p class="no-content">No additional content found.</p>
+    <% } else { %>
+        <div class="related-container">
+            <% franchise.forEach(item => { %>
+                <div class="franchise-card" data-anime="<%= item.attributes.canonicalTitle %>">
+                    <img src="<%= item.attributes.posterImage.small %>" />
+                    <p><%= item.attributes.canonicalTitle %></p>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+
+
+
+    <!-- RELATED ANIME -->
+    <h2 class="related-title">Related Anime</h2>
+
+    <div class="related-container">
+        <% related.forEach(item => { %>
+            <div class="related-card" data-anime="<%= item.attributes.canonicalTitle %>">
+                <img src="<%= item.attributes.posterImage.small %>" />
+                <p><%= item.attributes.canonicalTitle %></p>
+            </div>
+        <% }) %>
+    </div>
+
+    <%- include("partials/footer.ejs") %>
+</div>
+
+<script src="/js/main.js"></script>
 </body>
 </html>
